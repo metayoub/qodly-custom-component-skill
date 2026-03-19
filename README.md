@@ -2,6 +2,18 @@
 
 A Cursor/Claude Agent Skill for creating and developing **Qodly Studio Custom Components**—React-based building blocks that extend Qodly Pages.
 
+## Quick Install (skills.sh)
+
+```bash
+npx skills add metayoub/qodly-custom-component-skill
+```
+
+Or install the specific skill only:
+
+```bash
+npx skills add metayoub/qodly-custom-component-skill --skill qodly-custom-component
+```
+
 ## What This Skill Covers
 
 - Initializing new custom component projects (`qodly new component`)
@@ -36,11 +48,11 @@ cp -r qodly-custom-component ~/.cursor/skills/
 Clone or add as submodule:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/qodly-custom-component-skill.git
+git clone https://github.com/metayoub/qodly-custom-component-skill.git
 cp -r qodly-custom-component-skill/qodly-custom-component .cursor/skills/
 ```
 
-### Option 3: localskills.sh (skills.sh)
+### Option 3: localskills.sh
 
 1. Install CLI: `npm install -g @localskills/cli`
 2. Login: `localskills login`
@@ -85,6 +97,7 @@ Then add the import/export to `src/components/index.tsx`.
 
 ## References
 
+- [skills.sh](https://skills.sh/metayoub/qodly-custom-component-skill/qodly-custom-component) — Install via `npx skills add metayoub/qodly-custom-component-skill`
 - [Qodly Custom Component Docs](https://developer.4d.com/qodly/Integrations/customComponent/overview)
 - [Community Components (GitHub)](https://github.com/qodly/custom-components)
 
