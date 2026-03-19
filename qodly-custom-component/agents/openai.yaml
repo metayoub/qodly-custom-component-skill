@@ -1,0 +1,4 @@
+interface:
+  display_name: "Qodly Custom Component"
+  short_description: "Create and develop Qodly Studio custom components"
+  default_prompt: "Use $qodly-custom-component to scaffold or implement a Qodly custom component."

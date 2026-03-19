@@ -5,10 +5,13 @@ A Cursor/Claude Agent Skill for creating and developing **Qodly Studio Custom Co
 ## What This Skill Covers
 
 - Initializing new custom component projects (`qodly new component`)
+- Scaffolding new components (`scripts/scaffold-component.sh`)
 - Project structure (config, build, render, settings)
 - `@ws-ui/webform-editor` patterns (T4DComponentConfig, useEnhancedNode, useRenderer, useSources)
+- Datasource patterns (array, entitysel, IteratorProvider)
 - Vite + Module Federation + proxy setup for Qodly development
 - Settings API (ESetting types, DATAGRID, etc.)
+- Troubleshooting (proxy, federation, datasource)
 
 ## Installation
 
@@ -65,10 +68,29 @@ The agent uses this skill when you ask about:
 - proxy.config for Qodly dev server
 - Build vs Render patterns in Qodly components
 
+## Scaffold Script
+
+To scaffold a new component inside an existing Qodly project:
+
+```bash
+# Copy script to your project root
+cp qodly-custom-component/scripts/scaffold-component.sh /path/to/your/qodly-project/
+cd /path/to/your/qodly-project
+chmod +x scaffold-component.sh
+./scaffold-component.sh MyComponent
+./scaffold-component.sh Carousel --datasource entitysel
+```
+
+Then add the import/export to `src/components/index.tsx`.
+
 ## References
 
 - [Qodly Custom Component Docs](https://developer.4d.com/qodly/Integrations/customComponent/overview)
 - [Community Components (GitHub)](https://github.com/qodly/custom-components)
+
+## Version
+
+Compatible with Qodly Studio 21 R2 BETA.
 
 ## License
 

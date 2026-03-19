@@ -1,6 +1,6 @@
 ---
 name: qodly-custom-component
-description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, or working with @ws-ui/webform-editor, @qodly/cli, Module Federation, or proxy.config for Qodly development.
+description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, craftjs, IteratorProvider, entitysel datasource, or qodly build.
 ---
 
 # Qodly Custom Component
@@ -17,6 +17,13 @@ Custom Components are user-created React components for Qodly Studio. They use `
 npx @qodly/cli new component
 # or, if @qodly/cli is installed: qodly new component
 ```
+
+**Scaffold a new component** inside an existing project:
+```bash
+./scripts/scaffold-component.sh MyComponent
+./scripts/scaffold-component.sh Carousel --datasource entitysel
+```
+Then add the import/export to `src/components/index.tsx`.
 
 This scaffolds a project with:
 - `package.json` (app_id, name, @qodly/cli, @ws-ui/* peer deps)
@@ -129,8 +136,50 @@ npm run build
 
 Produces federated bundle. Install the built component in Qodly Studio per [Custom Components for Qodly Studio](https://github.com/qodly/custom-components).
 
+## Complete Example (Pie Chart)
+
+**index.tsx** — Build vs Render switch:
+```tsx
+const Pie: T4DComponent<IPieProps> = (props) => {
+  const { enabled } = useEnhancedEditor((state) => ({ enabled: state.options.enabled }));
+  return enabled ? <Build {...props} /> : <Render {...props} />;
+};
+Pie.craft = config.craft;
+Pie.info = config.info;
+Pie.defaultProps = config.defaultProps;
+```
+
+**Build** — Mock data, `useEnhancedNode`, `connect`:
+```tsx
+const { connectors: { connect } } = useEnhancedNode();
+const data = useMemo(() => ({ labels: ['A','B','C'], datasets: [{ data: [1,2,3] }] }), []);
+return <div ref={connect}><PieChart data={data} options={options} /></div>;
+```
+
+**Render** — Real datasource, `useRenderer`, `useSources`:
+```tsx
+const { connect } = useRenderer();
+const { sources: { datasource: ds } } = useSources();
+const [value, setValue] = useState(initial);
+
+useEffect(() => {
+  if (!ds) return;
+  const listener = async () => { const v = await ds.getValue(); setValue(v); };
+  listener();
+  ds.addListener('changed', listener);
+  return () => ds.removeListener('changed', listener);
+}, [ds]);
+```
+
 ## References
 
 - **Project structure**: See [references/project-structure.md](references/project-structure.md)
 - **Settings API**: See [references/settings-api.md](references/settings-api.md)
+- **Datasource patterns**: See [references/datasource-patterns.md](references/datasource-patterns.md)
+- **Events**: See [references/events.md](references/events.md)
+- **Troubleshooting**: See [references/troubleshooting.md](references/troubleshooting.md)
 - **Community**: [github.com/qodly/custom-components](https://github.com/qodly/custom-components)
+
+## Version
+
+Compatible with Qodly Studio 21 R2 BETA. Docs: [developer.4d.com/qodly/Integrations/customComponent](https://developer.4d.com/qodly/Integrations/customComponent/overview).
