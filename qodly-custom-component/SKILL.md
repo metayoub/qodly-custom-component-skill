@@ -182,4 +182,4 @@ useEffect(() => {
 
 ## Version
 
-Compatible with Qodly Studio 21 R2 BETA. Docs: [developer.4d.com/qodly/Integrations/customComponent](https://developer.4d.com/qodly/Integrations/customComponent/overview).
+Compatible with Qodly Studio - 4D 21. Docs: [developer.4d.com/qodly/Integrations/customComponent](https://developer.4d.com/qodly/Integrations/customComponent/overview).

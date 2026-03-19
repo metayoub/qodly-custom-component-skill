@@ -103,7 +103,7 @@ Then add the import/export to `src/components/index.tsx`.
 
 ## Version
 
-Compatible with Qodly Studio 21 R2 BETA.
+Compatible with Qodly Studio - 4D 21.
 
 ## License
 
