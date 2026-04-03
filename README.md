@@ -132,6 +132,67 @@ localskills publish qodly-pages/SKILL.md \
 
 4. Others install with: `localskills install YOUR_TEAM/qodly-custom-component` (and similarly for `qodly-docs`, `qodly-pages`).
 
+## Renamed the GitHub repository?
+
+### Point `origin` at the new URL (local clone)
+
+GitHub usually redirects the old URL, but you should update the remote so pushes and fetches use the canonical URL:
+
+```bash
+git remote -v
+git remote set-url origin https://github.com/YOUR_USER/YOUR_NEW_REPO.git
+git fetch origin
+```
+
+### Default branch (`main`)
+
+- **On GitHub:** Repository **Settings → General → Default branch** — set it to `main` (or whatever you use).
+- **Locally** (if your local branch should track it):
+
+```bash
+git fetch origin
+git branch -u origin/main main
+```
+
+(If you still have `master` and want `main`, rename with `git branch -m master main` first, then push and set the default on GitHub.)
+
+### skills.sh and links in this README
+
+Replace the old `owner/repo` everywhere you document it, for example:
+
+- `npx skills add YOUR_USER/YOUR_NEW_REPO`
+- Any [skills.sh](https://skills.sh/) page URLs that embed the old path
+
+### Updating skills on localskills.sh after a repo rename
+
+Renaming the repo on **GitHub does not change** your skill on localskills. Listings are identified by **`--team`** and **`--name`**, not by the repository URL.
+
+**Ship a new version of the same skill** (same team + name — what most people want):
+
+1. Commit and push your changes to the renamed repo (after fixing `origin` as above).
+2. From this repo root, run **`localskills publish`** again for each skill, using the **same** `--team` and `--name` as before:
+
+```bash
+localskills publish qodly-custom-component/SKILL.md \
+  --team YOUR_TEAM \
+  --name qodly-custom-component \
+  --visibility public \
+  --type skill \
+  -m "Brief note for this version"
+```
+
+Repeat for `qodly-docs/SKILL.md` and `qodly-pages/SKILL.md` if you publish those too.
+
+3. **Consumers** update with:
+
+```bash
+localskills pull YOUR_TEAM/qodly-custom-component
+localskills pull YOUR_TEAM/qodly-docs
+localskills pull YOUR_TEAM/qodly-pages
+```
+
+**Only if you want a new skill slug** on localskills (separate from the old name): publish with a **new** `--name`, then share the new `YOUR_TEAM/new-name` for `install` / `pull`. The old name’s history stays on localskills unless their product offers rename/delete — check [localskills.sh](https://localskills.sh) docs for your account.
+
 ## When each skill triggers
 
 **qodly-custom-component** — Custom React components, `@qodly/cli`, `@ws-ui/webform-editor`, Module Federation, proxy, build vs render, settings/i18n in components.
