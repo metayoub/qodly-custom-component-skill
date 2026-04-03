@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qodly-saved-conditions",
+  "title": "Qodly Saved Conditions",
+  "description": "JSON schema for saved_conditions.json — reusable conditional visibility rules for Qodly components. Conditions evaluate datasource values and can be combined with AND/OR logic. Located at Project/Sources/Shared/saved_conditions.json.",
+  "type": "object",
+  "required": ["conditions"],
+  "additionalProperties": false,
+  "properties": {
+    "conditions": {
+      "type": "array",
+      "description": "Array of top-level condition definitions. Each can be a simple datasource check or a combination (AND/OR) of nested conditions.",
+      "items": { "$ref": "#/definitions/Condition" }
+    }
+  },
+
+  "definitions": {
+    "Condition": {
+      "type": "object",
+      "required": ["id", "type"],
+      "description": "A condition node. Two types: 'datasource' (leaf — evaluates a single datasource path) or 'combination' (branch — groups conditions with AND/OR).",
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique condition ID (nanoid)."
+        },
+        "type": {
+          "type": "string",
+          "description": "Condition type: 'datasource' for leaf comparisons, 'combination' for AND/OR groups.",
+          "enum": ["datasource", "combination"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable label for this condition (used in Qodly Studio UI)."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "datasource" } } },
+          "then": { "$ref": "#/definitions/DatasourceCondition" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "combination" } } },
+          "then": { "$ref": "#/definitions/CombinationCondition" }
+        }
+      ]
+    },
+
+    "DatasourceCondition": {
+      "type": "object",
+      "description": "Leaf condition that evaluates a single datasource path against a value using a comparison operator.",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Datasource path to evaluate. Format: 'namespace:datasource.attribute' (e.g. 'shared:article.title', 'problems:selectedIncident.nbrTasks')."
+        },
+        "op": {
+          "type": "string",
+          "description": "Comparison operator.",
+          "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "isnull", "notnull", "istrue", "isfalse", "contains", "notcontains", "startswith", "endswith"]
+        },
+        "value": {
+          "type": "string",
+          "description": "Comparison value. For hardcoded: a literal string. For datasource: a datasource path (e.g. 'shared:user.fullName')."
+        },
+        "valueType": {
+          "type": "string",
+          "description": "How to interpret the value field.",
+          "enum": ["hardCoded", "datasource"]
+        },
+        "dsType": {
+          "type": "string",
+          "description": "Data type of the datasource being evaluated (string, number, date, bool, long, entity, etc.)."
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Alternate data type hint (used alongside dsType in some conditions)."
+        },
+        "low": {
+          "type": "string",
+          "description": "Alternate operator field (legacy/variant — same role as 'op')."
+        }
+      }
+    },
+
+    "CombinationCondition": {
+      "type": "object",
+      "description": "Branch condition that groups nested conditions with a logical operator.",
+      "properties": {
+        "op": {
+          "type": "string",
+          "description": "Logical operator to combine nested conditions.",
+          "enum": ["and", "or"]
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Nested conditions (can be datasource or combination — supports arbitrary depth).",
+          "items": { "$ref": "#/definitions/Condition" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qodly-i18n",
+  "title": "Qodly i18n",
+  "description": "JSON schema for i18n.json — internationalization configuration for Qodly applications. Stores translation keys and language settings. Located at Project/Sources/Shared/i18n.json.",
+  "type": "object",
+  "required": ["keys", "userLang"],
+  "additionalProperties": false,
+  "properties": {
+    "keys": {
+      "type": "object",
+      "description": "Translation key map. Each key is a translation identifier used in Qodly pages. Values are objects mapping language codes (plus 'default') to translated strings. Empty {} when i18n is not configured.",
+      "additionalProperties": {
+        "$ref": "#/definitions/TranslationEntry"
+      }
+    },
+    "userLang": {
+      "type": "object",
+      "description": "User language configuration — defines the primary language and supported languages for the application.",
+      "required": ["primary", "supported"],
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "Primary/default language ISO code (e.g. 'en', 'fr', 'de'). Empty string when not configured."
+        },
+        "supported": {
+          "type": "array",
+          "description": "List of supported languages. Empty array when not configured. When configured, each entry is an object with an isocode property.",
+          "items": {
+            "$ref": "#/definitions/SupportedLanguage"
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "TranslationEntry": {
+      "type": "object",
+      "description": "Translations for a single key. Must include 'default' (fallback value). Other keys are language/locale codes matching the supported languages (e.g. 'en', 'fr', 'es-ES', 'nl-NL'). Not all languages need to be present for every key.",
+      "required": ["default"],
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Fallback translation used when the user's language is not available for this key."
+        }
+      },
+      "additionalProperties": {
+        "type": "string",
+        "description": "Translated text for a specific language/locale code."
+      }
+    },
+    "SupportedLanguage": {
+      "type": "object",
+      "description": "A supported language entry.",
+      "required": ["isocode"],
+      "additionalProperties": false,
+      "properties": {
+        "isocode": {
+          "type": "string",
+          "description": "ISO language code. Can be a simple code ('en', 'fr', 'de', 'pt') or a locale-specific code ('es-ES', 'nl-NL')."
+        }
+      }
+    }
+  }
+}

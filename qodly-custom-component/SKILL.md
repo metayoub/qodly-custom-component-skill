@@ -1,11 +1,18 @@
 ---
 name: qodly-custom-component
-description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, useI18n, ESetting.I18NFIELD, i18n translations, craftjs, IteratorProvider, entitysel datasource, or qodly build.
+description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, useI18n, ESetting.I18NFIELD, i18n translations, craftjs, IteratorProvider, entitysel datasource, or qodly build. For Qodly product docs (components, page loaders, roles, webform-editor API notes), use the qodly-docs skill. For generating or editing .WebForm JSON and page schemas, use the qodly-pages skill.
 ---
 
 # Qodly Custom Component
 
 Guidance for creating and developing Custom Components for Qodly Studio—React-based building blocks that extend Qodly Pages.
+
+## Companion skills (same repository)
+
+When this skill is installed from the **Qodly skills** bundle (or you copied sibling folders into `.cursor/skills/`):
+
+- **qodly-docs** — Read markdown/mdx under `qodly-docs/` for Qodly Pro reference: built-in components, page loaders, events, datasources, localization, roles, and custom-component integration topics.
+- **qodly-pages** — Use `qodly-pages/` when authoring **web pages** (`.WebForm` JSON), JSON schemas, craft-component catalogs, and Studio page/i18n rules—not for React custom component code.
 
 ## Overview
 

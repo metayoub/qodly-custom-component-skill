@@ -1,0 +1,977 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qodly-webform-v1.0",
+  "title": "Qodly WebForm",
+  "description": "JSON schema for .WebForm files used by Qodly Studio / 4D. Derived from 169 real-world pages across 7 applications.",
+  "type": "object",
+  "required": ["metadata", "components"],
+  "additionalProperties": false,
+  "properties": {
+    "metadata": { "$ref": "#/definitions/Metadata" },
+    "components": { "$ref": "#/definitions/ComponentMap" }
+  },
+
+  "definitions": {
+
+    "Metadata": {
+      "type": "object",
+      "required": ["v", "datasources", "styles"],
+      "additionalProperties": true,
+      "properties": {
+        "v": {
+          "type": "string",
+          "description": "Schema version. Always \"1.0\" in current Qodly.",
+          "const": "1.0"
+        },
+        "datasources": {
+          "type": "array",
+          "description": "Page-level data source declarations that components bind to.",
+          "items": { "$ref": "#/definitions/DataSource" }
+        },
+        "styles": {
+          "type": "array",
+          "description": "Page-level CSS class definitions (local styles).",
+          "items": { "$ref": "#/definitions/StyleDef" }
+        }
+      }
+    },
+
+    "DataSource": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique name used to reference this datasource in component bindings."
+        },
+        "type": {
+          "type": "string",
+          "description": "Datasource category.",
+          "enum": ["scalar", "entity", "entitysel", "object", "collection"]
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Scope namespace. Empty string = page-local. 'shared'/'Shared' = cross-page. Custom names for module scoping."
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Scalar/object data type.",
+          "enum": ["string", "number", "date", "object", "array", "bool", "boolean", "duration"]
+        },
+        "dataclass": {
+          "type": "string",
+          "description": "ORDA DataClass name (for entity/entitysel types). E.g. 'Employee', 'Event'."
+        },
+        "from": {
+          "type": "string",
+          "description": "Parent datasource ID. For entity derived from an entity selection (e.g. currentElement)."
+        },
+        "initialValue": {
+          "description": "Initial value. Varies by type: '' for empty, 'all' for full selection, 'first' for first entity, or a literal value.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "object" },
+            { "type": "array" },
+            { "type": "null" }
+          ]
+        },
+        "depth": {
+          "description": "Relation expand depth for entity/entitysel. null = default.",
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "Page size for entity selection lazy loading.",
+          "minimum": 1
+        },
+        "events": {
+          "type": "array",
+          "description": "Events attached to this datasource (e.g. onChange triggers a method).",
+          "items": { "$ref": "#/definitions/Event" }
+        }
+      }
+    },
+
+    "StyleDef": {
+      "type": "object",
+      "required": ["name", "content", "id"],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "CSS class name. Applied to components via classNames array."
+        },
+        "content": {
+          "type": "string",
+          "description": "Raw CSS. Use 'self' as selector for the target element. Supports @media queries, pseudo-selectors (:hover, :active), and descendant selectors."
+        },
+        "parentId": {
+          "description": "Parent style ID for inheritance. null = top-level.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique style identifier (auto-generated nanoid)."
+        },
+        "scope": {
+          "type": "string",
+          "description": "Style scope.",
+          "enum": ["local", "global"]
+        }
+      }
+    },
+
+    "ComponentMap": {
+      "type": "object",
+      "description": "Flat map of componentId → Component. Always contains a 'ROOT' key. IDs are nanoid-style strings (e.g. 'ZEhfp3f0p9').",
+      "properties": {
+        "ROOT": { "$ref": "#/definitions/Component" }
+      },
+      "required": ["ROOT"],
+      "additionalProperties": { "$ref": "#/definitions/Component" }
+    },
+
+    "Component": {
+      "type": "object",
+      "required": ["type", "isCanvas", "props", "displayName", "custom", "parent", "hidden", "nodes", "linkedNodes"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "object",
+          "required": ["resolvedName"],
+          "additionalProperties": false,
+          "properties": {
+            "resolvedName": {
+              "type": "string",
+              "description": "Component type name.",
+              "enum": [
+                "Container",
+                "StyleBox",
+                "Text",
+                "Icon",
+                "Button",
+                "Label",
+                "Input",
+                "TextInput",
+                "Image",
+                "SelectBox",
+                "Matrix",
+                "Dialog",
+                "WebformLoader",
+                "Select",
+                "SelectInput",
+                "FileUpload",
+                "Tags",
+                "TextEditor",
+                "Slider",
+                "SliderContainer",
+                "SliderTrack",
+                "SliderFilledTrack",
+                "SliderThumb",
+                "DataTable",
+                "Accordion",
+                "CheckboxInput",
+                "Checkbox",
+                "Radio",
+                "Tabs",
+                "DatePicker",
+                "Pie",
+                "Calendar",
+                "Popover",
+                "Bar",
+                "Timeline",
+                "StylishBox",
+                "Scheduler",
+                "PdfViewer",
+                "Fallback",
+                "DayView",
+                "ColorInput",
+                "Virtualizer",
+                "Tree",
+                "MonthPicker",
+                "Line",
+                "Donut",
+                "Bubble"
+              ]
+            }
+          }
+        },
+        "isCanvas": {
+          "type": "boolean",
+          "description": "true = container that accepts child nodes (drag target in Qodly Studio). false = leaf component."
+        },
+        "props": { "$ref": "#/definitions/ComponentProps" },
+        "displayName": {
+          "type": "string",
+          "description": "Human-readable label shown in Qodly Studio outline."
+        },
+        "custom": {
+          "type": "object",
+          "description": "Custom metadata, i18n translations, and layout hints. Usually empty {} when no i18n is used.",
+          "additionalProperties": true,
+          "properties": {
+            "__t": {
+              "description": "Translation metadata template. Structure depends on component type.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "doc": {
+                  "description": "For Text components: either an empty array (no i18n) or an array containing a metadata object with nested children referencing i18n keys. When i18n is active, each entry has: { children: [null, { children: [{ text: { key: '<i18n_key>', default: '<default_text>' } }] }] }.",
+                  "type": "array"
+                },
+                "text": {
+                  "description": "For Button components: an object with 'key' (i18n key from i18n.json) and 'default' (fallback text). Example: { key: 'sso_connect', default: 'Connect with SSO' }.",
+                  "type": "object",
+                  "properties": {
+                    "key": { "type": "string", "description": "i18n translation key (must exist in i18n.json)." },
+                    "default": { "type": "string", "description": "Default/fallback text when no translation is found." }
+                  }
+                }
+              },
+              "patternProperties": {
+                "^[a-zA-Z\\-]+$": {
+                  "description": "Per-language empty doc placeholder inside __t. Key is the language code (e.g. 'en', 'fr', 'es-ES'). Value is { doc: [] }.",
+                  "type": "object",
+                  "properties": {
+                    "doc": { "type": "array" }
+                  }
+                }
+              }
+            },
+            "contentHeight": {
+              "type": "number",
+              "description": "Internal layout hint (e.g. for SelectBox containers)."
+            }
+          },
+          "patternProperties": {
+            "^i18n:[a-zA-Z\\-]+$": {
+              "description": "Per-language translation override. Key format: 'i18n:<lang>' (e.g. 'i18n:en', 'i18n:fr', 'i18n:es-ES'). For Text components: { doc: [DocParagraph] }. For Button components: { text: '<translated string>' }.",
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "doc": {
+                  "type": "array",
+                  "description": "Translated rich text paragraphs for Text components.",
+                  "items": { "$ref": "#/definitions/DocParagraph" }
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Translated plain text for Button components."
+                }
+              }
+            }
+          }
+        },
+        "parent": {
+          "type": "string",
+          "description": "Parent component ID. Empty string '' for ROOT only."
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "Whether the component is hidden in Qodly Studio outline."
+        },
+        "nodes": {
+          "type": "array",
+          "description": "Ordered list of direct child component IDs (children placed inside this canvas).",
+          "items": { "type": "string" }
+        },
+        "linkedNodes": {
+          "type": "object",
+          "description": "Named slot → component ID map. Used by compound components (e.g. TextInput has 'label' and 'input' slots, Button has 'icon', Dialog has 'Dialog' and 'close', Tabs/Accordion have dynamic slot keys).",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+
+    "ComponentProps": {
+      "type": "object",
+      "description": "Component properties. Shape varies by resolvedName. All share common fields; component-specific fields are documented below.",
+      "properties": {
+        "events": {
+          "type": "array",
+          "description": "Event handlers attached to this component.",
+          "items": { "$ref": "#/definitions/Event" }
+        },
+        "style": {
+          "type": "object",
+          "description": "Inline CSS properties as camelCase key-value pairs. Values are typically strings but may be numbers.",
+          "additionalProperties": true
+        },
+        "classNames": {
+          "type": "array",
+          "description": "CSS class names from the page styles or shared styles.",
+          "items": { "type": "string" }
+        },
+        "className": {
+          "type": "string",
+          "description": "Utility class string (Tailwind-style). Used mainly on ROOT Container and some internal components."
+        },
+        "datasource": {
+          "type": "string",
+          "description": "Data binding path. Formats: 'dsName' (direct), 'dsName.attribute' (attribute), 'namespace:dsName' (cross-scope), '$This.attribute' (inside Matrix/SelectBox iteration)."
+        },
+        "serverSideRef": {
+          "type": "string",
+          "description": "Server-side reference ID. Used to target this component from server functions (e.g. for CSS manipulation, visibility control)."
+        },
+        "iterableChild": {
+          "type": "boolean",
+          "description": "Marks component as a repeated child inside Matrix/SelectBox."
+        },
+        "airyMode": {
+          "type": "boolean",
+          "description": "ROOT Container property. Enables spacing mode for top-level layout."
+        },
+        "text": {
+          "type": "string",
+          "description": "Text content for Button, Label, FileUpload."
+        },
+        "doc": {
+          "type": "array",
+          "description": "Rich text document model for Text component. Array of paragraph blocks.",
+          "items": { "$ref": "#/definitions/DocParagraph" }
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text for input components."
+        },
+        "label": {
+          "type": "string",
+          "description": "Label text for TextInput, SelectInput."
+        },
+        "labelPosition": {
+          "type": "string",
+          "description": "Label placement relative to input.",
+          "enum": ["left", "top", "right", "hidden"]
+        },
+        "type": {
+          "type": "string",
+          "description": "Component-specific type qualifier. For Input: text, password, number, date, etc. For Calendar: full. For Checkbox: two-state. Custom types also possible."
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Data type hint for Input binding.",
+          "enum": ["string", "number", "date", "bool", "boolean", "duration"]
+        },
+        "format": {
+          "type": "string",
+          "description": "Display format string (e.g. 'Date short', '0', custom format)."
+        },
+        "readonly": {
+          "type": "boolean",
+          "description": "Makes input read-only."
+        },
+        "readOnly": {
+          "type": "boolean",
+          "description": "Read-only flag (alternate casing used by some components like MonthPicker)."
+        },
+        "deletable": {
+          "type": "boolean",
+          "description": "Whether this sub-component can be deleted in the editor."
+        },
+        "moveable": {
+          "type": "boolean",
+          "description": "Whether this sub-component can be moved in the editor."
+        },
+        "icon": {
+          "type": "string",
+          "description": "FontAwesome icon class for Icon component (e.g. 'fa-star', 'fa-solid fa-check')."
+        },
+        "iconPosition": {
+          "type": "string",
+          "description": "Icon position in Button component.",
+          "enum": ["left", "right", "top", "hidden"]
+        },
+        "webform": {
+          "type": "string",
+          "description": "WebformLoader: name of the .WebForm page to embed."
+        },
+        "orientation": {
+          "type": "string",
+          "description": "Layout direction for Matrix, chart orientation, etc. Values: vertical, horizontal, x, y, Horizontal."
+        },
+        "iterable": {
+          "type": "boolean",
+          "description": "Marks Matrix/SelectBox as data-iterable."
+        },
+        "currentElement": {
+          "type": "string",
+          "description": "Matrix/SelectBox/DataTable: datasource name for the current iteration entity."
+        },
+        "gridProps": {
+          "type": "object",
+          "description": "Matrix grid configuration.",
+          "properties": {
+            "styleboxWidth": { "type": "number" },
+            "styleboxHeight": { "type": "number" },
+            "styleboxPercentWidth": { "type": "string" },
+            "enableMosaic": { "type": "boolean" }
+          },
+          "additionalProperties": true
+        },
+        "columns": {
+          "type": "array",
+          "description": "DataTable column definitions.",
+          "items": { "$ref": "#/definitions/DataTableColumn" }
+        },
+        "headerHeight": {
+          "type": "number",
+          "description": "DataTable header row height in px."
+        },
+        "rowHeight": {
+          "description": "DataTable body row height in px.",
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string" }
+          ]
+        },
+        "showBorders": {
+          "type": "boolean",
+          "description": "DataTable: show cell borders."
+        },
+        "tabs": {
+          "type": "array",
+          "description": "Tabs component: tab definitions.",
+          "items": { "$ref": "#/definitions/TabDef" }
+        },
+        "variant": {
+          "type": "string",
+          "description": "Visual variant for Tabs ('line', 'enclosed', etc.) or Accordion ('default', etc.)."
+        },
+        "items": {
+          "type": "array",
+          "description": "Accordion panel definitions.",
+          "items": { "$ref": "#/definitions/AccordionItem" }
+        },
+        "multiple": {
+          "type": "boolean",
+          "description": "Accordion: allow multiple panels open simultaneously."
+        },
+        "transition": {
+          "type": "string",
+          "description": "Accordion animation duration class."
+        },
+        "position": {
+          "type": "string",
+          "description": "Accordion chevron position."
+        },
+        "radius": {
+          "type": "string",
+          "description": "Accordion border-radius class."
+        },
+        "openChevron": {
+          "type": "string",
+          "description": "Accordion icon when panel is open."
+        },
+        "closeChevron": {
+          "type": "string",
+          "description": "Accordion icon when panel is closed."
+        },
+        "overlay": {
+          "type": "boolean",
+          "description": "Dialog: show background overlay."
+        },
+        "closable": {
+          "type": "boolean",
+          "description": "Dialog: show close button."
+        },
+        "animated": {
+          "type": "boolean",
+          "description": "Dialog: enable open/close animation."
+        },
+        "options": {
+          "type": "array",
+          "description": "Select/Radio: static option definitions.",
+          "items": { "$ref": "#/definitions/SelectOption" }
+        },
+        "defaultValue": {
+          "description": "Default selected value for Select/Radio.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" }
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "description": "Radio selection mode.",
+          "enum": ["single", "multiple"]
+        },
+        "template": {
+          "type": "string",
+          "description": "SelectBox display template. Supports {{ length }} placeholder."
+        },
+        "rowsNumber": {
+          "type": "integer",
+          "description": "SelectBox: visible rows in dropdown."
+        },
+        "name": {
+          "type": "string",
+          "description": "Component name (charts, some components)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Chart title text."
+        },
+        "cutout": {
+          "type": "number",
+          "description": "Pie/Donut chart: inner cutout percentage."
+        },
+        "tooltip": {
+          "type": "boolean",
+          "description": "Chart: show tooltips."
+        },
+        "legendPosition": {
+          "type": "string",
+          "description": "Chart legend placement.",
+          "enum": ["top", "right", "bottom", "left", "hidden"]
+        },
+        "fileType": {
+          "type": "string",
+          "description": "FileUpload: accepted MIME types (e.g. 'image/*')."
+        },
+        "fileSizeLimit": {
+          "type": "string",
+          "description": "FileUpload: maximum file size."
+        },
+        "revealPassword": {
+          "type": "boolean",
+          "description": "Input: show password reveal toggle."
+        },
+        "twentyFourHours": {
+          "type": "boolean",
+          "description": "Input (time): use 24-hour format."
+        },
+        "eyePosition": {
+          "type": "string",
+          "description": "Input: password reveal icon position.",
+          "enum": ["left", "right"]
+        },
+        "isFixedWidth": {
+          "type": "boolean",
+          "description": "SelectBox container: fixed width mode."
+        },
+        "role": {
+          "type": "string",
+          "description": "Semantic role for sub-components (accordion-header, accordion-content, tab, item1, item2, etc.)."
+        },
+        "selectedMonthColor": {
+          "type": "string",
+          "description": "MonthPicker: highlight color."
+        },
+        "selectedRangeColor": {
+          "type": "string",
+          "description": "MonthPicker: range selection color."
+        },
+        "selectedMonthRaduis": {
+          "type": "string",
+          "description": "MonthPicker: selection border radius."
+        },
+        "language": {
+          "type": "string",
+          "description": "MonthPicker/DatePicker: locale.",
+          "enum": ["en", "fr", "de", "es", "it", "pt", "ar", "ja"]
+        },
+        "selectionModes": {
+          "type": "string",
+          "description": "MonthPicker: selection mode.",
+          "enum": ["single", "range"]
+        },
+        "id": {
+          "type": "string",
+          "description": "Optional component HTML id."
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "Event": {
+      "type": "object",
+      "required": ["type"],
+      "description": "Event handler. Three types: 'method' (calls exposed 4D function), 'simple-action' (client-side datasource operation), 'navigation' (page transition).",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["method", "simple-action", "navigation", "dialog", "qodly-pro-action"]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique event handler ID (nanoid)."
+        },
+        "events": {
+          "type": "array",
+          "description": "Trigger names that fire this handler.",
+          "items": {
+            "type": "string",
+            "description": "Event trigger name (onclick, onload, oninit, onchange, onChange, onselect, onopen, onclose, onmouseenter, onmouseleave, onloaded, onclickaction, etc.)."
+          }
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Disable this event handler without removing it."
+        },
+        "feedback": {
+          "description": "Show loading feedback during execution.",
+          "oneOf": [
+            { "type": "boolean" },
+            {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "method" } } },
+          "then": { "$ref": "#/definitions/MethodEvent" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "simple-action" } } },
+          "then": { "$ref": "#/definitions/SimpleActionEvent" }
+        },
+        {
+          "if": { "properties": { "type": { "const": "navigation" } } },
+          "then": { "$ref": "#/definitions/NavigationEvent" }
+        }
+      ]
+    },
+
+    "MethodEvent": {
+      "type": "object",
+      "description": "Calls an exposed 4D class function via REST.",
+      "properties": {
+        "dataclass": {
+          "type": "string",
+          "description": "Target dataclass or 'DataStore' for datastore-level functions."
+        },
+        "method": {
+          "type": "string",
+          "description": "Fully qualified method path. Formats: 'ds.functionName' (DataStore), 'ds.DataClass.functionName' (DataClass), 'entityDatasource.functionName' (entity-level). Can also use namespace:datasource.function for shared entity selections."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace of the datasource the method is called on (for shared datasources)."
+        },
+        "params": {
+          "type": "array",
+          "description": "Parameters passed to the function.",
+          "items": { "$ref": "#/definitions/MethodParam" }
+        },
+        "datasource": {
+          "type": "string",
+          "description": "Datasource context (usually empty for dataclass methods)."
+        },
+        "returns": {
+          "$ref": "#/definitions/MethodReturn",
+          "description": "Return value mapping — routes the function result back into a datasource."
+        }
+      }
+    },
+
+    "MethodParam": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Parameter name matching the 4D function signature."
+        },
+        "type": {
+          "type": "string",
+          "description": "Parameter type. Matches 4D types: string, number, boolean, date, object, variant, or ORDA class types (cs.EntityName, cs.EntityNameEntity, cs.EntityNameSelection)."
+        },
+        "datasource": {
+          "type": "string",
+          "description": "Datasource path to read the value from. Empty if hardcoded."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique param ID (nanoid)."
+        },
+        "isHardCoded": {
+          "type": "boolean",
+          "description": "true = use hardCodedValue instead of datasource."
+        },
+        "hardCodedValue": {
+          "description": "Literal value when isHardCoded is true.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" }
+          ]
+        },
+        "hardCodedType": {
+          "type": "string",
+          "description": "Type qualifier for hardcoded value."
+        }
+      }
+    },
+
+    "MethodReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Return variable name (conventionally 'result', '$0')."
+        },
+        "type": {
+          "type": "string",
+          "description": "Return type. Can be 4D types, ORDA class types (cs.EntityEntity, cs.EntitySelection), 'Variable', 'collection', 'object', etc."
+        },
+        "datasource": {
+          "type": "string",
+          "description": "Datasource to populate with the return value. Supports namespace prefix (e.g. 'shared:datasourceName', 'Shared:datasourceName')."
+        }
+      }
+    },
+
+    "SimpleActionEvent": {
+      "type": "object",
+      "description": "Client-side datasource manipulation without server call.",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "Action verb: copy, refresh, set, create, delete, add, reset, clear, all, save, orderBy, remove, empty, query, logout, clean, click, previous, next, hover, first. Can also be empty string."
+        },
+        "actionType": {
+          "type": "string",
+          "description": "Qualifier for the action target (datasource, auth, state)."
+        },
+        "datasource": {
+          "type": "object",
+          "description": "Target datasource for the action.",
+          "properties": {
+            "name": { "type": "string", "description": "Datasource ID." },
+            "type": { "type": "string" },
+            "from": { "type": "string" },
+            "namespace": { "type": "string" },
+            "dataType": { "type": "string" },
+            "set": {
+              "type": "object",
+              "description": "Value payload for 'set' action.",
+              "properties": {
+                "value": {},
+                "type": { "type": "string" }
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "NavigationEvent": {
+      "type": "object",
+      "description": "Page navigation — loads another .WebForm page.",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Target WebForm page name (without .WebForm extension)."
+        },
+        "externalLink": {
+          "type": "boolean",
+          "description": "true = navigate to external URL."
+        },
+        "loader": {
+          "type": "string",
+          "description": "WebformLoader component ID to load the target page into. Empty = full page navigation."
+        },
+        "parent": {
+          "type": "string",
+          "description": "Navigation context. 'same-tab' = current tab, 'webform-loader-self' = enclosing WebformLoader.",
+          "enum": ["same-tab", "webform-loader-self", "webform-loader", "new-tab", ""]
+        },
+        "isHardCoded": {
+          "type": "boolean",
+          "description": "true = target is a static page name."
+        }
+      }
+    },
+
+    "DocParagraph": {
+      "type": "object",
+      "description": "Rich text paragraph in the Text component's document model.",
+      "required": ["type", "children"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "paragraph"
+        },
+        "children": {
+          "type": "array",
+          "description": "Inline spans within the paragraph.",
+          "items": { "$ref": "#/definitions/DocInline" }
+        }
+      }
+    },
+
+    "DocInline": {
+      "type": "object",
+      "description": "Inline text or datasource span inside a paragraph.",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Literal text content."
+        },
+        "bold": { "type": "boolean" },
+        "italic": { "type": "boolean" },
+        "underlined": { "type": "boolean" },
+        "strikethrough": { "type": "boolean" },
+        "type": {
+          "type": "string",
+          "description": "Span type. 'datasource' for dynamic data binding, 'link' for hyperlinks, 'i18n' for translated text."
+        },
+        "datasource": {
+          "type": "string",
+          "description": "Datasource path for dynamic text (e.g. 'Results.reported', '$This.name')."
+        },
+        "dsType": {
+          "type": "string",
+          "description": "Data type of the bound datasource (string, number, date, boolean, duration, long, bool, or empty)."
+        },
+        "format": {
+          "type": "string",
+          "description": "Display format for the datasource value."
+        },
+        "__i18n": {
+          "type": "string",
+          "description": "i18n translation key (references a key in i18n.json). Used when type is 'i18n'."
+        },
+        "__baseValue": {
+          "type": "string",
+          "description": "Base/default text value before translation. Used when type is 'i18n'."
+        },
+        "id": {
+          "description": "Unique identifier for the inline span (numeric timestamp). Used with i18n spans.",
+          "type": "number"
+        },
+        "children": {
+          "type": "array",
+          "description": "Nested inline spans (used inside datasource or i18n spans as display template).",
+          "items": { "$ref": "#/definitions/DocInline" }
+        }
+      }
+    },
+
+    "DataTableColumn": {
+      "type": "object",
+      "description": "Column definition for the DataTable component.",
+      "required": ["title", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Column header label."
+        },
+        "source": {
+          "type": "string",
+          "description": "Entity attribute path for this column's data."
+        },
+        "width": {
+          "description": "Column width (CSS value, e.g. '30%', '200px', or number in px).",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" }
+          ]
+        },
+        "sorting": {
+          "type": "boolean",
+          "description": "Enable sorting on this column."
+        },
+        "format": {
+          "type": "string",
+          "description": "Display format for cell values."
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Data type of the column values.",
+          "enum": ["string", "number", "date", "boolean", "image", "duration", "object"]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique column ID (nanoid)."
+        }
+      }
+    },
+
+    "TabDef": {
+      "type": "object",
+      "description": "Tab definition for the Tabs component.",
+      "required": ["title", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Tab label text."
+        },
+        "initialSsRef": {
+          "type": "string",
+          "description": "Server-side reference for initial tab content."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique tab ID (nanoid). Also used as linkedNodes key."
+        }
+      }
+    },
+
+    "AccordionItem": {
+      "type": "object",
+      "description": "Panel definition for the Accordion component.",
+      "required": ["title", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Panel header text."
+        },
+        "initialSsRef": {
+          "type": "string",
+          "description": "Server-side reference for accordion panel content."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique panel ID (nanoid). Used to generate linkedNodes keys."
+        }
+      }
+    },
+
+    "SelectOption": {
+      "type": "object",
+      "description": "Static option for Select/Radio components.",
+      "required": ["label", "value", "id"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Display text."
+        },
+        "value": {
+          "description": "Option value.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique option ID (nanoid)."
+        }
+      }
+    }
+  }
+}

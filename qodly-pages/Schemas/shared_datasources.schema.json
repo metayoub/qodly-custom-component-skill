@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qodly-shared-datasources",
+  "title": "Qodly Shared Datasources",
+  "description": "JSON schema for shared_datasources.json — project-wide datasources shared across all Qodly pages. Top-level keys are namespace names (shared, user, UI, Qodly, etc.), each containing an array of datasource definitions. Located at Project/Sources/Shared/shared_datasources.json.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "array",
+    "description": "Array of datasource definitions within this namespace.",
+    "items": { "$ref": "#/definitions/SharedDataSource" }
+  },
+
+  "definitions": {
+    "SharedDataSource": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique datasource name within its namespace. Referenced in pages as 'namespace:id' (e.g. 'shared:articles', 'user:connectedUser')."
+        },
+        "type": {
+          "type": "string",
+          "description": "Datasource category.",
+          "enum": ["scalar", "entity", "entitysel", "object", "collection"]
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace this datasource belongs to. Must match the parent key in the JSON."
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Data type for scalar datasources.",
+          "enum": ["string", "number", "date", "object", "array", "bool", "boolean", "duration"]
+        },
+        "dataclass": {
+          "type": "string",
+          "description": "ORDA DataClass name for entity/entitysel types (e.g. 'Employee', 'Article')."
+        },
+        "from": {
+          "type": "string",
+          "description": "Parent datasource ID. Used when an entity is derived from an entity selection (current element binding)."
+        },
+        "initialValue": {
+          "description": "Initial value on page load. Common values: '' (empty), 'all' (full entity selection), 'first' (first entity), 'empty' (empty entity), or a literal value/object.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "object" },
+            { "type": "array" },
+            { "type": "null" }
+          ]
+        },
+        "depth": {
+          "description": "Relation expand depth for entity/entitysel. null = default depth.",
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        },
+        "pageSize": {
+          "description": "Page size for entity selection lazy loading.",
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "string" }
+          ]
+        },
+        "events": {
+          "type": "array",
+          "description": "Events attached to this datasource (e.g. onChange triggers a server method). Uses the same event structure as WebForm events.",
+          "items": { "$ref": "#/definitions/Event" }
+        },
+        "schema": {
+          "type": "object",
+          "description": "Schema definition for object-typed scalars (used by Qodly platform datasources like Location, UserLanguage).",
+          "properties": {
+            "type": { "type": "string" },
+            "properties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "type": "string" },
+                  "initialValue": {}
+                }
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "Event": {
+      "type": "object",
+      "description": "Event handler (same structure as WebForm events). See webform.schema.json for full documentation.",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Event handler type.",
+          "enum": ["method", "simple-action", "navigation", "dialog", "qodly-pro-action"]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique event handler ID (nanoid)."
+        },
+        "events": {
+          "type": "array",
+          "description": "Trigger names (e.g. 'onChange', 'onclick').",
+          "items": { "type": "string" }
+        },
+        "dataclass": { "type": "string" },
+        "method": { "type": "string" },
+        "params": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "datasource": {
+          "description": "Datasource context. Usually a string, but can be an object for simple-action events.",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "object", "additionalProperties": true }
+          ]
+        },
+        "returns": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "externalLink": { "type": "boolean" },
+        "loader": { "type": "string" },
+        "parent": { "type": "string" },
+        "target": { "type": "string" },
+        "isHardCoded": { "type": "boolean" }
+      }
+    }
+  }
+}

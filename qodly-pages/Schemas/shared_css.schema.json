@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qodly-shared-css",
+  "title": "Qodly Shared CSS",
+  "description": "JSON schema for shared_css.json — project-wide reusable CSS classes available to all Qodly pages. Located at Project/Sources/Shared/shared_css.json.",
+  "type": "object",
+  "required": ["classes"],
+  "additionalProperties": false,
+  "properties": {
+    "classes": {
+      "type": "array",
+      "description": "Array of reusable CSS class definitions. Applied to components via the classNames prop array.",
+      "items": { "$ref": "#/definitions/CssClass" }
+    }
+  },
+
+  "definitions": {
+    "CssClass": {
+      "type": "object",
+      "required": ["name", "content", "id"],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "CSS class name. Referenced in component props.classNames arrays across all pages."
+        },
+        "content": {
+          "type": "string",
+          "description": "Raw CSS content. Use 'self' as the selector for the target element. Supports pseudo-selectors (:hover, :active, :focus), pseudo-elements (:after), @media queries, :has() selectors, descendant selectors, and CSS animations."
+        },
+        "parentId": {
+          "description": "Parent class ID for inheritance. null = top-level (no parent).",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this class (nanoid)."
+        },
+        "children": {
+          "type": "object",
+          "description": "Child class map. Usually empty {}.",
+          "additionalProperties": true
+        },
+        "origin": {
+          "type": "string",
+          "description": "Origin identifier (appears in some classes, likely tracking provenance)."
+        }
+      }
+    }
+  }
+}
