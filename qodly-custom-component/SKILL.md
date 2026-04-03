@@ -1,6 +1,6 @@
 ---
 name: qodly-custom-component
-description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, craftjs, IteratorProvider, entitysel datasource, or qodly build.
+description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, useI18n, ESetting.I18NFIELD, i18n translations, craftjs, IteratorProvider, entitysel datasource, or qodly build.
 ---
 
 # Qodly Custom Component
@@ -13,19 +13,24 @@ Custom Components are user-created React components for Qodly Studio. They use `
 
 ## Initialize a New Component Project
 
+From the directory where the project should live (or run interactively and choose the target path):
+
+```bash
+npx @qodly/cli init
+```
+
+This is the supported way to create a new custom component project. Do not rely on custom shell scripts for setup—the CLI provisions the full layout.
+
+**Add another component** inside an existing project (after `init`):
+
 ```bash
 npx @qodly/cli new component
-# or, if @qodly/cli is installed: qodly new component
+# or, if @qodly/cli is installed locally: npm run generate:component
 ```
 
-**Scaffold a new component** inside an existing project:
-```bash
-./scripts/scaffold-component.sh MyComponent
-./scripts/scaffold-component.sh Carousel --datasource entitysel
-```
-Then add the import/export to `src/components/index.tsx`.
+Then ensure the new component is exported from `src/components/index.tsx` following the pattern the CLI generated for existing components.
 
-This scaffolds a project with:
+`npx @qodly/cli init` produces a project with:
 - `package.json` (app_id, name, @qodly/cli, @ws-ui/* peer deps)
 - `vite.config.ts` (Module Federation, Monaco editor, proxy)
 - `proxy.config.ts` (dev proxy to Qodly server)
@@ -56,7 +61,7 @@ component-name/
 | File | Purpose |
 |------|---------|
 | `*.config.tsx` | `T4DComponentConfig`: craft, info, defaultProps, datasources.accept |
-| `*.settings.ts` | `TSetting[]` for Studio property panel (ESetting.TEXT_FIELD, DATAGRID, etc.) |
+| `*.settings.ts` | `TSetting[]` for Studio property panel (ESetting.TEXT_FIELD, I18NFIELD, DATAGRID, etc.) |
 | `*.build.tsx` | Editor mode: `useEnhancedNode`, mock/static data for canvas |
 | `*.render.tsx` | Runtime mode: `useRenderer`, `useSources`, real datasource binding |
 | `index.tsx` | Wraps Build/Render: `enabled ? <Build /> : <Render />` |
@@ -93,6 +98,32 @@ export default {
 
 - **Build**: `useEnhancedNode()`, `connect`, no real datasource. Use for drag-and-drop canvas.
 - **Render**: `useRenderer()`, `useSources()`, `ds.getValue()`, `ds.addListener('changed', ...)`. Use for runtime with Qodly data.
+
+### Internationalization (i18n)
+
+**Settings (`*.settings.ts`)** — Import `getStaticFeaturesExperimentalFlag` from `@ws-ui/webform-editor`, then use `ESetting.I18NFIELD` when i18n is enabled:
+
+```ts
+import { ESetting, getStaticFeaturesExperimentalFlag } from '@ws-ui/webform-editor';
+
+const isI18nEnabled = getStaticFeaturesExperimentalFlag('i18n');
+
+// Example setting entry:
+// type: isI18nEnabled ? ESetting.I18NFIELD : ESetting.TEXT_FIELD,
+```
+
+**Render / labels** — Resolve translated strings with `useI18n()`:
+
+```tsx
+import { useI18n } from '@ws-ui/webform-editor';
+
+const { i18n } = useI18n();
+const lang = i18n?.userLang?.primary ?? 'de';
+const entry = i18n?.keys?.[yourKeyName];
+const value = entry?.[lang] ?? entry?.de;
+```
+
+See [references/i18n.md](references/i18n.md) for full notes.
 
 ### Index Wrapper
 
@@ -175,6 +206,7 @@ useEffect(() => {
 
 - **Project structure**: See [references/project-structure.md](references/project-structure.md)
 - **Settings API**: See [references/settings-api.md](references/settings-api.md)
+- **i18n**: See [references/i18n.md](references/i18n.md)
 - **Datasource patterns**: See [references/datasource-patterns.md](references/datasource-patterns.md)
 - **Events**: See [references/events.md](references/events.md)
 - **Troubleshooting**: See [references/troubleshooting.md](references/troubleshooting.md)

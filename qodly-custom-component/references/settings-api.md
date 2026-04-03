@@ -7,6 +7,7 @@ From `@ws-ui/webform-editor`:
 | Type | Use Case |
 |------|----------|
 | `ESetting.TEXT_FIELD` | Single-line text |
+| `ESetting.I18NFIELD` | Translatable text in Studio (use when i18n is enabled; see [i18n.md](i18n.md)) |
 | `ESetting.NUMBER_FIELD` | Numeric value |
 | `ESetting.CHECKBOX` | Boolean |
 | `ESetting.SELECT` | Dropdown (options: `{ value, label }[]`) |

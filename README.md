@@ -16,13 +16,14 @@ npx skills add metayoub/qodly-custom-component-skill --skill qodly-custom-compon
 
 ## What This Skill Covers
 
-- Initializing new custom component projects (`qodly new component`)
-- Scaffolding new components (`scripts/scaffold-component.sh`)
+- Initializing new custom component projects (`npx @qodly/cli init`)
+- Adding components inside a project (`npx @qodly/cli new component` / `npm run generate:component`)
 - Project structure (config, build, render, settings)
 - `@ws-ui/webform-editor` patterns (T4DComponentConfig, useEnhancedNode, useRenderer, useSources)
 - Datasource patterns (array, entitysel, IteratorProvider)
 - Vite + Module Federation + proxy setup for Qodly development
-- Settings API (ESetting types, DATAGRID, etc.)
+- Settings API (ESetting types, DATAGRID, I18NFIELD, etc.)
+- i18n (`getStaticFeaturesExperimentalFlag('i18n')`, `useI18n`, `i18n.keys`)
 - Troubleshooting (proxy, federation, datasource)
 
 ## Installation
@@ -80,20 +81,21 @@ The agent uses this skill when you ask about:
 - proxy.config for Qodly dev server
 - Build vs Render patterns in Qodly components
 
-## Scaffold Script
+## CLI: new project vs new component
 
-To scaffold a new component inside an existing Qodly project:
+**New project** (full setup):
 
 ```bash
-# Copy script to your project root
-cp qodly-custom-component/scripts/scaffold-component.sh /path/to/your/qodly-project/
-cd /path/to/your/qodly-project
-chmod +x scaffold-component.sh
-./scaffold-component.sh MyComponent
-./scaffold-component.sh Carousel --datasource entitysel
+npx @qodly/cli init
 ```
 
-Then add the import/export to `src/components/index.tsx`.
+**New component** inside an existing project:
+
+```bash
+npx @qodly/cli new component
+```
+
+Then confirm exports in `src/components/index.tsx` if needed.
 
 ## References
 
