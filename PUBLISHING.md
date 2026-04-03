@@ -4,7 +4,7 @@
 
 ### Option A: Publish as Standalone Repo
 
-1. Create a new GitHub repository (e.g. `qodly-custom-component-skill`).
+1. Create a new GitHub repository (e.g. `qodly-skill`).
 
 2. Copy the skill folder:
    ```bash
@@ -19,7 +19,7 @@
    git add .
    git commit -m "Initial skill: Qodly custom component"
    git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/qodly-custom-component-skill.git
+   git remote add origin https://github.com/YOUR_USERNAME/qodly-skill.git
    git push -u origin main
    ```
 
@@ -60,7 +60,7 @@ cp -r your-repo/"Qodly skills"/qodly-custom-component ~/.cursor/skills/
 
 3. **Publish**
    ```bash
-   cd "Qodly skills"
+   cd /path/to/qodly-skill   # repo root
    localskills publish qodly-custom-component/SKILL.md \
      --team YOUR_TEAM \
      --name qodly-custom-component \

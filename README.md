@@ -11,15 +11,15 @@ This repository ships **three** Cursor/Claude-compatible agent skills:
 ## Quick Install (skills.sh)
 
 ```bash
-npx skills add metayoub/qodly-custom-component-skill
+npx skills add metayoub/qodly-skill
 ```
 
 Or install a specific skill only:
 
 ```bash
-npx skills add metayoub/qodly-custom-component-skill --skill qodly-custom-component
-npx skills add metayoub/qodly-custom-component-skill --skill qodly-docs
-npx skills add metayoub/qodly-custom-component-skill --skill qodly-pages
+npx skills add metayoub/qodly-skill --skill qodly-custom-component
+npx skills add metayoub/qodly-skill --skill qodly-docs
+npx skills add metayoub/qodly-skill --skill qodly-pages
 ```
 
 *(If the remote package does not yet expose `qodly-docs` / `qodly-pages`, copy the folders manually as in [Installation](#installation) below.)*
@@ -63,7 +63,7 @@ Install only what you need; the three folders are independent skills (each has i
 Update **all three** into a project:
 
 ```bash
-cd /path/to/this/repo   # "Qodly skills" root
+cd /path/to/this/repo   # e.g. clone of github.com/metayoub/qodly-skill
 rm -rf .cursor/skills/qodly-custom-component .cursor/skills/qodly-docs .cursor/skills/qodly-pages
 mkdir -p .cursor/skills
 cp -r qodly-custom-component qodly-docs qodly-pages .cursor/skills/
@@ -100,8 +100,8 @@ localskills pull YOUR_TEAM/qodly-pages
 Clone or add as submodule:
 
 ```bash
-git clone https://github.com/metayoub/qodly-custom-component-skill.git
-cd qodly-custom-component-skill
+git clone https://github.com/metayoub/qodly-skill.git
+cd qodly-skill
 cp -r qodly-custom-component qodly-docs qodly-pages /path/to/your/project/.cursor/skills/
 ```
 
@@ -112,7 +112,7 @@ cp -r qodly-custom-component qodly-docs qodly-pages /path/to/your/project/.curso
 3. Publish from this repo (repeat per skill):
 
 ```bash
-cd "Qodly skills"
+cd /path/to/qodly-skill   # repo root
 localskills publish qodly-custom-component/SKILL.md \
   --team YOUR_TEAM \
   --name qodly-custom-component \
@@ -133,6 +133,8 @@ localskills publish qodly-pages/SKILL.md \
 4. Others install with: `localskills install YOUR_TEAM/qodly-custom-component` (and similarly for `qodly-docs`, `qodly-pages`).
 
 ## Renamed the GitHub repository?
+
+Published home for this bundle: [github.com/metayoub/qodly-skill](https://github.com/metayoub/qodly-skill).
 
 ### Point `origin` at the new URL (local clone)
 
@@ -219,7 +221,8 @@ Then confirm exports in `src/components/index.tsx` if needed.
 
 ## References
 
-- [skills.sh](https://skills.sh/metayoub/qodly-custom-component-skill/qodly-custom-component) — Install via `npx skills add metayoub/qodly-custom-component-skill`
+- [skills.sh](https://skills.sh/metayoub/qodly-skill/qodly-custom-component) — Install via `npx skills add metayoub/qodly-skill`
+- [Source on GitHub](https://github.com/metayoub/qodly-skill)
 - [Qodly Custom Component Docs](https://developer.4d.com/qodly/Integrations/customComponent/overview)
 - [Community Components (GitHub)](https://github.com/qodly/custom-components)
 
