@@ -9,7 +9,7 @@ Guidance for creating and developing Custom Components for Qodly Studio—React-
 
 ## Companion skills (same repository)
 
-When this skill is installed from the **Qodly skills** bundle (or you copied sibling folders into `.cursor/skills/`):
+When this skill is installed from the **Qodly skills** bundle (or you copied sibling folders into your skills directory):
 
 - **qodly-docs** — Read markdown/mdx under `qodly-docs/` for Qodly Pro reference: built-in components, page loaders, events, datasources, localization, roles, and custom-component integration topics.
 - **qodly-pages** — Use `qodly-pages/` when authoring **web pages** (`.WebForm` JSON), JSON schemas, craft-component catalogs, and Studio page/i18n rules—not for React custom component code.

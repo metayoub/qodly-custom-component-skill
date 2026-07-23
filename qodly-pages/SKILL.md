@@ -37,7 +37,7 @@ description: >-
 
 ## Reference Documentation
 
-For detailed Qodly documentation (components, events, datasources, styling, roles, permissions, deployment, etc.), read the **qodly-docs** skill (sibling folder `qodly-docs/` in the same repo, or `~/.cursor/skills/qodly-docs/` when installed). Key sections:
+For detailed Qodly documentation (components, events, datasources, styling, roles, permissions, deployment, etc.), read the **qodly-docs** skill (sibling folder `qodly-docs/` in the same skills directory). Key sections:
 - `4DQodlyPro/pageLoaders/components/` — individual component docs (DataTable, Tabs, Button, Text, SelectBox, etc.)
 - `4DQodlyPro/pageLoaders/events/` — event management and binding actions
 - `4DQodlyPro/pageLoaders/qodlySources.md` — Qodly datasources
@@ -209,12 +209,12 @@ Craft components are the building blocks for Qodly pages. See [craft-components.
 
 ## Official 4D Documentation
 
-The backend for Qodly pages runs on 4D. Consult docs at `.cursor/skills/4d-docs/` for:
+The backend for Qodly pages runs on 4D. If the **4d-docs** skill is installed, consult its docs for:
 
-- **REST API**: `.cursor/skills/4d-docs/REST/` — how exposed functions are called via REST, filtering, sorting, entity sets
-- **ORDA**: `.cursor/skills/4d-docs/ORDA/` — data model classes, privileges, entity selections (powers data sources)
-- **API classes**: `.cursor/skills/4d-docs/API/` — DataClassClass, EntityClass, EntitySelectionClass (for exposed functions)
-- **Web Server**: `.cursor/skills/4d-docs/WebServer/` — server configuration underlying Qodly
-- **Users & permissions**: `.cursor/skills/4d-docs/Users/` — user management and access control
+- **REST API**: `4d-docs/REST/` — how exposed functions are called via REST, filtering, sorting, entity sets
+- **ORDA**: `4d-docs/ORDA/` — data model classes, privileges, entity selections (powers data sources)
+- **API classes**: `4d-docs/API/` — DataClassClass, EntityClass, EntitySelectionClass (for exposed functions)
+- **Web Server**: `4d-docs/WebServer/` — server configuration underlying Qodly
+- **Users & permissions**: `4d-docs/Users/` — user management and access control
 
 Read the relevant files when designing Qodly pages to ensure data bindings and exposed functions follow the correct API.
