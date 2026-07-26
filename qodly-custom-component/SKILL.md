@@ -1,6 +1,6 @@
 ---
 name: qodly-custom-component
-description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, useI18n, ESetting.I18NFIELD, i18n translations, craftjs, IteratorProvider, entitysel datasource, or qodly build. For Qodly product docs (components, page loaders, roles, webform-editor API notes), use the qodly-docs skill. For generating or editing .WebForm JSON and page schemas, use the qodly-pages skill.
+description: Create, scaffold, and develop Qodly Studio Custom Components. Use when building React-based custom components for Qodly, scaffolding new component projects, extending Qodly Pages with custom UI, working with @ws-ui/webform-editor, @qodly/cli, Module Federation, proxy.config, T4DComponent, useEnhancedNode, useRenderer, useSources, useDataLoader, useI18n, ESetting.I18NFIELD, i18n translations, craftjs, IteratorProvider, entity/object datasources, entitySel/entity selection datasources, iterable datasource declarations, or qodly build. For Qodly product docs (components, page loaders, roles, webform-editor API notes), use the qodly-docs skill. For generating or editing .WebForm JSON and page schemas, use the qodly-pages skill.
 ---
 
 # Qodly Custom Component
@@ -75,6 +75,15 @@ component-name/
 
 ## Key Patterns
 
+### Datasource Routing
+
+When a component reads Qodly data, first determine whether it binds to a single `entity`/`object` or an iterable `entitySel`/`array`.
+
+- Single `entity`/`object`: declare `datasource` plus child paths as `ds.attr`, expose `datasource` with `ESetting.DS_AUTO_SUGGEST`, and read with `useSources()` + `ds.getValue()` + `changed` listener.
+- Iterable `entitySel`/`array`: declare `datasource` as iterable plus child paths as `ds.[].attr`, expose `datasource` with `ESetting.DS_AUTO_SUGGEST`, and load rows with `useDataLoader({ source })` + `fetchIndex(0)`. Do not rely on `ds.getValue()` alone for entity selections; it may not trigger the network fetch.
+
+See [references/datasource-patterns.md](references/datasource-patterns.md) before implementing or debugging Qodly datasource fetching.
+
 ### Config (T4DComponentConfig)
 
 ```tsx
@@ -95,7 +104,7 @@ export default {
     exposed: true,
     icon: MyIcon,
     events: [{ label: 'On Click', value: 'onclick' }, ...],
-    datasources: { accept: ['entitysel'] },  // or ['array'], etc.
+    datasources: { accept: ['entity', 'object'] },  // or ['entitySel', 'array'] for iterable rows
   },
   defaultProps: { style: { height: '200px' }, ... },
 } as T4DComponentConfig<IProps>;
@@ -104,7 +113,7 @@ export default {
 ### Build vs Render
 
 - **Build**: `useEnhancedNode()`, `connect`, no real datasource. Use for drag-and-drop canvas.
-- **Render**: `useRenderer()`, `useSources()`, `ds.getValue()`, `ds.addListener('changed', ...)`. Use for runtime with Qodly data.
+- **Render**: `useRenderer()` plus `useSources()` for single `entity`/`object`; use `useDataLoader()` and `fetchIndex(0)` for iterable `entitySel`/`array`.
 
 ### Internationalization (i18n)
 
