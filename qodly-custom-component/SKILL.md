@@ -80,7 +80,8 @@ component-name/
 When a component reads Qodly data, first determine whether it binds to a single `entity`/`object` or an iterable `entitySel`/`array`.
 
 - Single `entity`/`object`: declare `datasource` plus child paths as `ds.attr`, expose `datasource` with `ESetting.DS_AUTO_SUGGEST`, and read with `useSources()` + `ds.getValue()` + `changed` listener.
-- Iterable `entitySel`/`array`: declare `datasource` as iterable plus child paths as `ds.[].attr`, expose `datasource` with `ESetting.DS_AUTO_SUGGEST`, and load rows with `useDataLoader({ source })` + `fetchIndex(0)`. Do not rely on `ds.getValue()` alone for entity selections; it may not trigger the network fetch.
+- Iterable `entitySel`/`array`: declare `datasource` as iterable plus child paths as `ds.[].attr`, expose `datasource` with `ESetting.DS_AUTO_SUGGEST`, and load rows with `useDataLoader({ source: ds })` + `fetchIndex(0)`. Do not rely on `ds.getValue()` alone for entity selections; it may not trigger the network fetch.
+- Use `useDsChangeHandler` only when the component also tracks a current row/selected element (`currentElement`, `selected`, `scrollIndex`, `count`). For display-only iterable components, prefer a guarded `ds.addListener('changed', fetch)` refresh. Avoid effects that repeatedly call `setStep()`/`fetchIndex()` from unstable dependencies; they can freeze the browser.
 
 See [references/datasource-patterns.md](references/datasource-patterns.md) before implementing or debugging Qodly datasource fetching.
 
@@ -113,7 +114,7 @@ export default {
 ### Build vs Render
 
 - **Build**: `useEnhancedNode()`, `connect`, no real datasource. Use for drag-and-drop canvas.
-- **Render**: `useRenderer()` plus `useSources()` for single `entity`/`object`; use `useDataLoader()` and `fetchIndex(0)` for iterable `entitySel`/`array`.
+- **Render**: `useRenderer()` plus `useSources()` for single `entity`/`object`; use `useDataLoader()` and `fetchIndex(0)` for iterable `entitySel`/`array`; add `useDsChangeHandler()` only for components that maintain current row selection.
 
 ### Internationalization (i18n)
 

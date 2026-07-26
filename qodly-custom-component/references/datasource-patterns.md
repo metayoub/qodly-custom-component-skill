@@ -131,7 +131,7 @@ datasets: datasets.map((set) => ({
 
 ## Single Entity/Object
 
-For detail components that render one selected entity or object. Pattern is the same as `qodly_map` `SingleMap`.
+For detail components that render one selected entity or object.
 
 **Config:**
 ```tsx
@@ -161,7 +161,7 @@ For nested fields, read from the root object first, then optionally fall back to
 
 ## Entity Selection / Iterable Rows
 
-For components that render rows from an entity selection or array. Pattern is the same as `qodly_map` `MultiMap`.
+For components that render rows from an entity selection or array. Choose the refresh strategy based on whether the component owns row selection.
 
 **Config:**
 ```tsx
@@ -170,34 +170,112 @@ sanityCheck: { keys: [{ name: 'datasource', require: true, isDatasource: true }]
 requiredFields: { keys: ['datasource'], all: false },
 ```
 
-**Render — useDataLoader + fetchIndex:**
+**Render baseline — useDataLoader + fetchIndex:**
 ```tsx
 import { useDataLoader, useSources } from '@ws-ui/webform-editor';
 
-function cloneDatasource(source: datasources.DataSource): datasources.DataSource {
-  const clone = Object.create(Object.getPrototypeOf(source)) as datasources.DataSource & {
-    id: string;
-    children: Record<string, unknown>;
-  };
-  Object.assign(clone, source);
-  clone.id = `${source.id}_clone`;
-  clone.children = {};
-  return clone;
-}
+const {
+  sources: { datasource: ds },
+} = useSources({ acceptIteratorSel: true });
 
-const { sources: { datasource } } = useSources({ acceptIteratorSel: true });
-const source = useMemo(() => (datasource ? cloneDatasource(datasource) : null), [datasource]);
 const { entities, fetchIndex } = useDataLoader({
-  source: source as datasources.DataSource,
+  source: ds as datasources.DataSource,
 });
 
 useEffect(() => {
-  if (!source) return;
-  fetchIndex(0);
-}, [source, fetchIndex]);
+  if (!ds) return;
+  void fetchIndex(0);
+}, [ds]);
 ```
 
-Use `entities` as the rows. Do not rely on `datasource.getValue()` alone for entity selections; it may not send the network request.
+Use `entities` as the UI rows. Do not rely on `datasource.getValue()` alone for entity selections; it may not send the network request.
+
+**Display-only iterable refresh:**
+
+Use this when the component does not manage `currentElement` or selected row state.
+
+```tsx
+const fetchRef = useRef(fetchIndex);
+
+useEffect(() => {
+  fetchRef.current = fetchIndex;
+}, [fetchIndex]);
+
+useEffect(() => {
+  if (!ds) return;
+
+  const fetch = () => {
+    void fetchRef.current(0);
+  };
+
+  fetch();
+  ds.addListener('changed', fetch);
+  return () => ds.removeListener('changed', fetch);
+}, [ds]);
+```
+
+Keep fetch functions in refs when needed. Avoid effects that depend on unstable `fetchIndex`/`setStep` and also call them; that can create a render/fetch loop and freeze the browser.
+
+**Selection-aware iterable refresh — useDsChangeHandler:**
+
+Use this only when the component has a selected row/current element or writes the selected row to `currentElement`.
+
+```tsx
+import { useDataLoader, useDsChangeHandler, useSources } from '@ws-ui/webform-editor';
+
+const {
+  sources: { datasource: ds, currentElement: currentDs },
+} = useSources({ acceptIteratorSel: true });
+
+const { setStep, page, entities, fetchIndex } = useDataLoader({
+  source: ds as datasources.DataSource,
+});
+
+const [selected, setSelected] = useState(-1);
+const [scrollIndex, setScrollIndex] = useState(0);
+const [count, setCount] = useState(0);
+const [pageSize, setPageSize] = useState(100);
+
+useDsChangeHandler({
+  source: ds as datasources.DataSource,
+  currentDs: currentDs as datasources.DataSource,
+  selected,
+  scrollIndex,
+  setSelected,
+  setScrollIndex,
+  setCount,
+  fetchIndex,
+  onDsChange: ({ length, selected }) => {
+    if (selected >= 0 && selected >= length) {
+      setSelected(0);
+    }
+  },
+});
+
+useEffect(() => {
+  if (!ds) return;
+
+  const isScalarArray = ds.type === 'scalar' && ds.dataType === 'array';
+  const isRootIterator = !ds.parentSource;
+
+  if (!isScalarArray && isRootIterator) {
+    const nextPageSize = ds.getPageSize();
+    setPageSize(nextPageSize);
+    setStep({ start: 0, end: nextPageSize });
+  }
+
+  void fetchIndex(0);
+}, []);
+
+useEffect(() => {
+  if (count > entities.length) {
+    setStep({ start: 0, end: Math.max(count, page.end, pageSize) });
+    void fetchIndex(0);
+  }
+}, [count]);
+```
+
+Do not call `useDsChangeHandler` conditionally. Do not use `count !== entities.length` as a fetch trigger; when the datasource shrinks or loader state lags, that can loop. Prefer `count > entities.length` or another monotonic/guarded condition.
 
 **Build — IteratorProvider + StyleBox for nested row content:**
 ```tsx
